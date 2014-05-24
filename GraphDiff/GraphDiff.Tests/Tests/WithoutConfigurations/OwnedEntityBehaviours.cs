@@ -76,7 +76,7 @@ namespace RefactorThis.GraphDiff.Tests.Tests.WithoutConfigurations
         }
 
         [TestMethod]
-        public void ShouldRemoveEntityIfRemovedFromParent()
+        public void ShouldNotRemoveEntityIfRemovedFromParent()
         {
             var oneToOne = new OneToOneOwnedModel { Title = "New Entity" };
             var node1 = new TestNode { Title = "New Node", OneToOneOwned = oneToOne };
@@ -95,7 +95,7 @@ namespace RefactorThis.GraphDiff.Tests.Tests.WithoutConfigurations
                 context.SaveChanges();
                 var node2 = context.Nodes.Include(p => p.OneToOneOwned).Single(p => p.Id == node1.Id);
                 Assert.IsNotNull(node2);
-                Assert.IsNull(context.OneToOneOwnedModels.SingleOrDefault(p => p.Id == oneToOne.Id));
+					 Assert.IsNotNull(context.OneToOneOwnedModels.SingleOrDefault(p => p.Id == oneToOne.Id));
             }
         }
     }

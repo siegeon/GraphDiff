@@ -36,7 +36,7 @@ namespace RefactorThis.GraphDiff.Tests.Tests.WithoutConfigurations
         }
 
         [TestMethod]
-        public void ShouldRemoveAssociatedRelationIfNull()
+        public void ShouldNotRemoveAssociatedRelationIfNull()
         {
             var node1 = new TestNode { Title = "New Node", OneToOneAssociated = new OneToOneAssociatedModel { Title = "Associated Node" } };
 
@@ -56,7 +56,7 @@ namespace RefactorThis.GraphDiff.Tests.Tests.WithoutConfigurations
                 context.SaveChanges();
                 var node2 = context.Nodes.Include(p => p.OneToOneAssociated).Single(p => p.Id == node1.Id);
                 Assert.IsNotNull(node2);
-                Assert.IsTrue(node2.OneToOneAssociated == null);
+                Assert.IsFalse(node2.OneToOneAssociated == null);
             }
         }
 
@@ -86,9 +86,9 @@ namespace RefactorThis.GraphDiff.Tests.Tests.WithoutConfigurations
                 context.SaveChanges();
                 var node2 = context.Nodes.Include(p => p.OneToOneAssociated).Single(p => p.Id == node1.Id);
                 Assert.IsNotNull(node2);
-                Assert.IsTrue(node2.OneToOneAssociated.OneParent == node2);
+                Assert.IsFalse(node2.OneToOneAssociated.OneParent == node2);
                 // should not delete it as it is associated and no cascade rule set.
-                Assert.IsTrue(context.OneToOneAssociatedModels.Single(p => p.Id != otherModel.Id).OneParent == null);                
+					 Assert.IsFalse(context.OneToOneAssociatedModels.Single(p => p.Id != otherModel.Id).OneParent == null);                
             }
         }
 

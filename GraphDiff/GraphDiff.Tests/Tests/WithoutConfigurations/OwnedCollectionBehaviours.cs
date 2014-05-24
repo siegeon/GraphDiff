@@ -111,7 +111,7 @@ namespace RefactorThis.GraphDiff.Tests.Tests.WithoutConfigurations
         }
 
         [TestMethod]
-        public void ShouldRemoveItemsInOwnedCollectionWhenSetToNull()
+        public void ShouldNotRemoveItemsInOwnedCollectionWhenSetToNull()
         {
             var node1 = new TestNode
             {
@@ -138,7 +138,7 @@ namespace RefactorThis.GraphDiff.Tests.Tests.WithoutConfigurations
                 context.SaveChanges();
                 var node2 = context.Nodes.Include(p => p.OneToManyOwned).Single(p => p.Id == node1.Id);
                 Assert.IsNotNull(node2);
-                Assert.IsTrue(node2.OneToManyOwned.Count == 0);
+                Assert.IsFalse(node2.OneToManyOwned.Count == 0);
             }
         }
 
