@@ -32,6 +32,7 @@ namespace RefactorThis.GraphDiff.Internal
 
 		private void WalkTree<TEntity>(DbContext context, TEntity entity)
 		{
+			var navprops = context.GetNavigationPropertiesForType(typeof (TEntity));
 			foreach (NavigationProperty navigationProperty in context.GetNavigationPropertiesForType(typeof (TEntity)))
 			{
 				PropertyInfo entityProperty = entity.GetType().GetProperties().First(pi => navigationProperty.Name == pi.Name);
@@ -41,6 +42,7 @@ namespace RefactorThis.GraphDiff.Internal
 				if(_visitedEntities.Contains(entityProperty.GetHashCode())) continue;
 				_visitedEntities.Add(entityProperty.GetHashCode());
 
+
 				DetermineRelationShip(navigationProperty);
 				GraphNode newMember = CreateNewMember(entityProperty);
 				if (newMember == null) continue;
@@ -49,14 +51,11 @@ namespace RefactorThis.GraphDiff.Internal
 				_currentMember = newMember;
 
 
-				if (entityProperty.PropertyType.IsCollectionType(typeof (ICollection<>)))
+				if (entityProperty.PropertyType.IsCollectionType(typeof(IEnumerable<>)))
 				{
-					if (((ICollection)value).Count > 0)
-					{					
-						foreach (var collectionEntity in value)
-						{
-							WalkTree(context, collectionEntity);
-						}
+					foreach (var collectionEntity in value)
+					{
+						WalkTree(context, collectionEntity);
 					}
 				}
 				else
