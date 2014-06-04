@@ -12,16 +12,18 @@ using System.Xml.Schema;
 
 namespace RefactorThis.GraphDiff.Internal
 {
-	 internal static class Extensions
-	 {
-		  internal static IEnumerable<PropertyInfo> GetPrimaryKeyFieldsFor(this IObjectContextAdapter context, Type entityType)
-		  {
+    internal static class Extensions
+    {
+        internal static IEnumerable<PropertyInfo> GetPrimaryKeyFieldsFor(this IObjectContextAdapter context, Type entityType)
+        {
 			EntityType metadata = context.ObjectContext.MetadataWorkspace
-						  .GetItems<EntityType>(DataSpace.OSpace)
-						  .SingleOrDefault(p => p.FullName == entityType.FullName);
+                    .GetItems<EntityType>(DataSpace.OSpace)
+                    .SingleOrDefault(p => p.FullName == entityType.FullName);
 
-				if (metadata == null)
-					 throw new InvalidOperationException(String.Format("The type {0} is not known to the DbContext.", entityType.FullName));
+            if (metadata == null)
+            {
+                throw new InvalidOperationException(String.Format("The type {0} is not known to the DbContext.", entityType.FullName));
+            }
 
 			return
 				metadata.KeyMembers.Select(
@@ -116,21 +118,21 @@ namespace RefactorThis.GraphDiff.Internal
 				default:
 					throw new ArgumentOutOfRangeException();
 			}
-		}
+        }
 
-		internal static IEnumerable<NavigationProperty> GetRequiredNavigationPropertiesForType(this IObjectContextAdapter context, Type entityType)
-		{
-			return context.GetNavigationPropertiesForType(ObjectContext.GetObjectType(entityType))
-				.Where(navigationProperty => navigationProperty.ToEndMember.RelationshipMultiplicity == RelationshipMultiplicity.One);
-		}
+        internal static IEnumerable<NavigationProperty> GetRequiredNavigationPropertiesForType(this IObjectContextAdapter context, Type entityType)
+        {
+            return context.GetNavigationPropertiesForType(ObjectContext.GetObjectType(entityType))
+                    .Where(navigationProperty => navigationProperty.ToEndMember.RelationshipMultiplicity == RelationshipMultiplicity.One);
+        }
 
-		internal static IEnumerable<NavigationProperty> GetNavigationPropertiesForType(this IObjectContextAdapter context, Type entityType)
-		{
-			return context.ObjectContext.MetadataWorkspace
-				.GetItems<EntityType>(DataSpace.OSpace)
-				.Single(p => p.FullName == entityType.FullName)
-				.NavigationProperties;
-		}
+        internal static IEnumerable<NavigationProperty> GetNavigationPropertiesForType(this IObjectContextAdapter context, Type entityType)
+        {
+            return context.ObjectContext.MetadataWorkspace
+                    .GetItems<EntityType>(DataSpace.OSpace)
+                    .Single(p => p.FullName == entityType.FullName)
+                    .NavigationProperties;
+        }
 
 		public static dynamic ToType<T>(this object @object, T destinationType)
 		{
@@ -211,24 +213,24 @@ namespace RefactorThis.GraphDiff.Internal
 			return listInstance;
 		  }
  
-		  internal static string GetEntitySetName(this IObjectContextAdapter context, Type entityType)
-		  {
-				Type type = entityType;
-				EntitySetBase set = null;
+        internal static string GetEntitySetName(this IObjectContextAdapter context, Type entityType)
+        {
+            Type type = entityType;
+            EntitySetBase set = null;
 
-				while (set == null && type != null)
-				{
-					 set = context.ObjectContext.MetadataWorkspace
-								.GetEntityContainer(context.ObjectContext.DefaultContainerName, DataSpace.CSpace)
-								.EntitySets
-								.FirstOrDefault(item => item.ElementType.Name.Equals(type.Name));
+            while (set == null && type != null)
+            {
+                set = context.ObjectContext.MetadataWorkspace
+                        .GetEntityContainer(context.ObjectContext.DefaultContainerName, DataSpace.CSpace)
+                        .EntitySets
+                        .FirstOrDefault(item => item.ElementType.Name.Equals(type.Name));
 
-					 type = type.BaseType;
-				}
+                type = type.BaseType;
+            }
 
-				return set != null ? set.Name : null;
-		  }
+            return set != null ? set.Name : null;
+        }
 	 
 		 #endregion
-	 }
+    }
 }
