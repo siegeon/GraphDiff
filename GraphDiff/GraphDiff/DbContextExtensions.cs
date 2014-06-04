@@ -14,21 +14,43 @@ namespace RefactorThis.GraphDiff
 {
 	public static class DbContextExtensions
 	{
-        /// <summary>
-        /// Merges a graph of entities with the data store.
-        /// </summary>
-        /// <typeparam name="T">The type of the root entity</typeparam>
-        /// <param name="context">The database context to attach / detach.</param>
-        /// <param name="entity">The root entity.</param>
-        /// <param name="mapping">The mapping configuration to define the bounds of the graph</param>
-        /// <returns>The attached entity graph</returns>
-	    public static T UpdateGraph<T>(this DbContext context, T entity, Expression<Func<IUpdateConfiguration<T>, object>> mapping = null) where T : class, new()
-	    {
-            var root = mapping == null ? new GraphNode() : new ConfigurationVisitor<T>().GetNodes(mapping);
-            var graphDiffer = new GraphDiffer<T>(root);
-            return graphDiffer.Merge(context, entity);
-	    }
+		/// <summary>
+		/// Merges a graph of entities with the data store.
+		/// </summary>
+		/// <typeparam name="T">The type of the root entity</typeparam>
+		/// <param name="context">The database context to attach / detach.</param>
+		/// <param name="entity">The root entity.</param>
+		/// <param name="mapping">The mapping configuration to define the bounds of the graph</param>
+		/// <returns>The attached entity graph</returns>
+		public static T UpdateGraph<T>(this DbContext context, T entity, Expression<Func<IUpdateConfiguration<T>, object>> mapping) where T : class, new()
+		{
+			var root = mapping == null ? new GraphNode() : new ConfigurationVisitor<T>().GetNodes(mapping);
 
-        // TODO add IEnumerable<T> entities
+			var graphDiffer = new GraphDiffer<T>(root);
+
+			return graphDiffer.Merge(context, entity);
+		}
+
+		/// <summary>
+		/// Merges a graph of entities with the data store.
+		/// </summary>
+		///
+		/// <typeparam name="T">The type of the root entity.</typeparam>
+		/// <param name="context">The database context to attach / detach.</param>
+		/// <param name="entity"> The root entity.</param>
+		///
+		/// <returns>
+		/// The attached entity graph.
+		/// </returns>
+		public static T UpdateGraph<T>(this DbContext context, T entity) where T : class, new()
+		{
+			var root = new NodeGenerator<T>().GetNodes(context, entity);
+
+			var graphDiffer = new GraphDiffer<T>(root);
+
+			return graphDiffer.Merge(context, entity);
+		}
+
+		// TODO add IEnumerable<T> entities
 	}
 }
